@@ -1,17 +1,37 @@
 name: CI
 
-on: [push]
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   run-tests:
     name: Lint and Test
     runs-on: ubuntu-latest
+
     steps:
+      # Checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Install dependencies
       - name: Install packages
         run: npm ci
 
-      #- name: Run ESlint
-        #run: npm run lint
+      # Run ESLint (if enabled; comment out if failing)
+      - name: Run ESlint
+        run: npm run lint
+
+      # Run Unit Tests using Jest
+      - name: Run Jest Tests
+        run: npm run ci:test
+
+      # Run Cypress Tests for E2E Testing
+      - name: Run Cypress Tests
+        uses: cypress-io/github-action@v4
+        with:
+          build: npm run build
+          start: npm start
+          wait-on: http://localhost:3000
